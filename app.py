@@ -8,6 +8,10 @@ CORS(app)
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 
+@app.route("/")
+def home():
+    return "Backend running 🚀"
+
 @app.route("/roast", methods=["POST"])
 def roast():
     try:
@@ -18,15 +22,10 @@ def roast():
 
         response = requests.post(
             url,
-            headers={
-                "Content-Type": "application/json"
-            },
             json={
                 "contents": [
                     {
-                        "parts": [
-                            {"text": prompt}
-                        ]
+                        "parts": [{"text": prompt}]
                     }
                 ]
             }
@@ -36,17 +35,11 @@ def roast():
         print(result)
 
         if "candidates" not in result:
-            return jsonify({
-                "reply": "API error: " + str(result)
-            })
+            return jsonify({"reply": "API error: " + str(result)})
 
         reply = result["candidates"][0]["content"]["parts"][0]["text"]
 
-        return jsonify({
-            "reply": reply
-        })
+        return jsonify({"reply": reply})
 
     except Exception as e:
-        return jsonify({
-            "reply": "Server error: " + str(e)
-        })
+        return jsonify({"reply": "Server error: " + str(e)})
