@@ -28,7 +28,7 @@ def roast():
         prompt = data["prompt"]
 
         # ✅ NEW Gemini API (v1)
-        url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent"
+        url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent"
 
         response = requests.post(
             url,
