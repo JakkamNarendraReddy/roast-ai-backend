@@ -6,14 +6,11 @@ import os
 app = Flask(__name__)
 CORS(app)
 
-# Get API key from Render environment
 API_KEY = os.getenv("GEMINI_API_KEY")
-
 
 @app.route("/")
 def home():
     return "🔥 Roast AI Backend Running"
-
 
 @app.route("/roast", methods=["POST"])
 def roast():
@@ -27,15 +24,10 @@ def roast():
 
         prompt = data["prompt"]
 
-        # ✅ NEW Gemini API (v1)
-        url = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}"
 
         response = requests.post(
             url,
-            headers={
-                "Content-Type": "application/json",
-                "x-goog-api-key": API_KEY
-            },
             json={
                 "contents": [
                     {
@@ -50,9 +42,8 @@ def roast():
         )
 
         result = response.json()
-        print(result)  # Debug logs (important)
+        print(result)
 
-        # ❌ Handle API errors
         if "candidates" not in result:
             return jsonify({
                 "reply": "API error: " + str(result)
@@ -60,16 +51,10 @@ def roast():
 
         reply = result["candidates"][0]["content"]["parts"][0]["text"]
 
-        return jsonify({
-            "reply": reply
-        })
+        return jsonify({"reply": reply})
 
     except Exception as e:
-        return jsonify({
-            "reply": "Server error: " + str(e)
-        })
+        return jsonify({"reply": "Server error: " + str(e)})
 
-
-# ✅ Required for Render
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
