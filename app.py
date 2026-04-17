@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests
 import os
 
 app = Flask(__name__)
+CORS(app)
 
-API_KEY = os.getenv("API_KEY")
+API_KEY = os.getenv("GEMINI_API_KEY")
 
 @app.route("/roast", methods=["POST"])
 def roast():
@@ -12,32 +14,30 @@ def roast():
         data = request.json
         prompt = data["prompt"]
 
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={API_KEY}"
+
         response = requests.post(
-            "https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {API_KEY}",
-                "Content-Type": "application/json"
-            },
+            url,
             json={
-                "model": "openai/gpt-4o-mini",
-                "messages": [
-                    {"role": "user", "content": prompt}
+                "contents": [
+                    {
+                        "parts": [
+                            {"text": prompt}
+                        ]
+                    }
                 ]
             }
         )
 
         result = response.json()
-
-        # 🔥 DEBUG LINE (IMPORTANT)
         print(result)
 
-        # ❌ If API failed
-        if "choices" not in result:
+        if "candidates" not in result:
             return jsonify({
                 "reply": "API error: " + str(result)
             })
 
-        reply = result["choices"][0]["message"]["content"]
+        reply = result["candidates"][0]["content"]["parts"][0]["text"]
 
         return jsonify({
             "reply": reply
