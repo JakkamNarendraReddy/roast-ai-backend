@@ -3,7 +3,8 @@ import requests
 
 app = Flask(__name__)
 
-API_KEY = "sk-or-YOUR-KEY"
+import os
+API_KEY = os.getenv("API_KEY")
 
 @app.route("/roast", methods=["POST"])
 def roast():
