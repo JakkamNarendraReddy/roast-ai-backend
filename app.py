@@ -1,13 +1,3 @@
-from flask_cors import CORS
-from flask import Flask, request, jsonify
-import requests
-
-app = Flask(__name__)
-CORS(app)
-
-import os
-API_KEY = os.getenv("API_KEY")
-
 @app.route("/roast", methods=["POST"])
 def roast():
     data = request.json
@@ -21,14 +11,16 @@ def roast():
         },
         json={
             "model": "openai/gpt-4o-mini",
-            "messages": [{"role": "user", "content": prompt}]
+            "messages": [
+                {"role": "user", "content": prompt}
+            ]
         }
     )
 
     result = response.json()
 
-    return jsonify({
-        "result": result["choices"][0]["message"]["content"]
-    })
+    reply = result["choices"][0]["message"]["content"]
 
-app.run(host="0.0.0.0", port=10000)
+    return jsonify({
+        "reply": reply
+    })
